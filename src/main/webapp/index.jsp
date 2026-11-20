@@ -4,15 +4,18 @@
 <head>
     <meta charset="UTF-8">
     <title>Hệ thống RestMan</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="assets/restman.css" rel="stylesheet">
 </head>
+
 <body class="bg-light">
-    <div class="container mt-5 text-center">
-        <h2 class="mb-4">Hệ thống Quản lý RestMan</h2>
-        <div class="d-flex justify-content-center gap-3">
-            <a href="frmLogin2.jsp" class="btn btn-success">Phân hệ Nhân viên</a>
-            <a href="customer/frmCustomerMain2.jsp" class="btn btn-primary">Phân hệ Khách hàng</a>
-        </div>
+<header class="site-header"><a class="site-brand" href="index.jsp">RestMan</a></header>
+<main class="home-main text-center">
+    <h2 class="page-title">Hệ thống Quản lý Nhà hàng RestMan</h2>
+    <div class="home-actions">
+        <a href="staff/frmLogin2.jsp" class="btn">Nhân viên bán hàng</a>
+        <a href="customer/frmCustomerMain2.jsp" class="btn">Khách hàng</a>
     </div>
+</main>
 </body>
 </html>

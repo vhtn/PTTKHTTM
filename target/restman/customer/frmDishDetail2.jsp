@@ -2,7 +2,7 @@
          pageEncoding="UTF-8" import="java.util.*,java.math.*,dao.*,model.*"%>
 <%!
     private String formatMoney(BigDecimal value) {
-        return new java.text.DecimalFormat("#,##0.00",
+        return new java.text.DecimalFormat("#,##0.##",
                 java.text.DecimalFormatSymbols.getInstance(java.util.Locale.GERMANY))
                 .format(value.setScale(2, RoundingMode.HALF_UP));
     }
@@ -12,16 +12,21 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <title>Chi tiết thông tin món ăn</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Chi tiết món ăn | RestMan</title>
+    <link href="../assets/restman.css" rel="stylesheet">
 </head>
+
 <%
     request.setCharacterEncoding("UTF-8");
     String idStr = request.getParameter("id");
+    String keyword = request.getParameter("keyword");
     MenuItem2 item = null;
+    MenuItemDAO2 menuItemDAO = new MenuItemDAO2();
     if (idStr != null && !idStr.trim().isEmpty()) {
         try {
             int id = Integer.parseInt(idStr.trim());
-            item = (new MenuItemDAO2()).getDishDetail(id);
+            item = menuItemDAO.getDishDetail(id);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -42,16 +47,25 @@
             isCombo = true;
             sizeStr = (c.getPortion() != null) ? c.getPortion() : "";
             unitStr = "Set";
-            comboDetailsList = c.getListComboDetails();
+        }
+    }
+
+    if (item instanceof Combo2) {
+        Combo2 combo = (Combo2) item;
+        comboDetailsList = menuItemDAO.getComboDetails(combo);
+        if (comboDetailsList != null) {
+            combo.setListComboDetails(comboDetailsList);
         }
     }
 %>
-<body>
-<h2>Chi tiết thông tin món ăn</h2>
+<body class="bg-light">
+<header class="site-header"><a class="site-brand" href="../index.jsp">RestMan</a></header>
+<h2 class="page-title">Chi tiết thông tin món ăn</h2>
+<main class="dish-detail-content">
 <% if (item != null) { %>
-<table border="0">
+<table class="dish-info-table" border="0">
     <tr>
-        <td rowspan="5" style="padding-right: 20px;">
+        <td class="dish-info-image" rowspan="5">
             <% if (item.getImage() != null && !item.getImage().trim().isEmpty()) { %>
             <img src="images/<%= item.getImage() %>" alt="<%= item.getName() %>" style="max-width: 200px; max-height: 180px;"/>
             <% } else { %>
@@ -83,13 +97,15 @@
 
 <% if (isCombo) { %>
 <h3>Thành phần</h3>
-<table style="border: 1px solid black; border-collapse: collapse;">
+<table class="data-table combo-components-table" style="border: 1px solid black; border-collapse: collapse;">
     <thead>
-    <td style="border: 1px solid black; padding: 0 15px 0 15px;">T.T</td>
-    <td style="border: 1px solid black; padding: 0 15px 0 15px;">Tên món</td>
-    <td style="border: 1px solid black; padding: 0 15px 0 15px;">Kích thước</td>
-    <td style="border: 1px solid black; padding: 0 15px 0 15px;">Đơn vị tính</td>
-    <td style="border: 1px solid black; padding: 0 15px 0 15px;">Số lượng</td>
+    <tr>
+        <th>T.T</th>
+        <th>Tên món</th>
+        <th>Kích thước</th>
+        <th>Đơn vị tính</th>
+        <th>Số lượng</th>
+    </tr>
     </thead>
     <%
         if (comboDetailsList != null && !comboDetailsList.isEmpty()) {
@@ -124,7 +140,9 @@
 <% } else { %>
 <h4>Không tìm thấy món ăn yêu cầu!</h4>
 <% } %>
-<br/>
-<button type="button" onclick="window.location.href='frmSearchDish2.jsp'">Quay lại</button>
+<div class="search-table-footer">
+    <button type="button" onclick="window.location.href='frmSearchDish2.jsp'">Quay lại</button>
+</div>
+</main>
 </body>
 </html>

@@ -14,40 +14,42 @@ public class OrderDetailsDAO2 extends DAO2 {
     }
 
     /**
-     * Lay danh sach chi tiet mon an trong phieu goi mon
-     * @param orderSlip doi tuong OrderSlip2
-     * @return danh sach OrderDetails2
+     * Lay danh sach mon da goi trong phieu
+     * @param orderSlipId ma phieu goi mon
+     * @return danh sach chi tiet mon, null neu truy van that bai
      */
-    public ArrayList<OrderDetails2> getOrderDetails(OrderSlip2 orderSlip) {
-        ArrayList<OrderDetails2> kq = null;
-        String sql = "{call getOrderDetails2(?)}"; // su dung stored procedure
+    public ArrayList<OrderDetails2> getOrderDetails(int orderSlipId) {
+        if (orderSlipId <= 0) {
+            throw new IllegalArgumentException("Mã phiếu gọi món phải lớn hơn 0.");
+        }
+        ArrayList<OrderDetails2> details = new ArrayList<OrderDetails2>();
         try {
-            CallableStatement cs = con.prepareCall(sql);
-            cs.setInt(1, orderSlip.getId());
-            ResultSet rs = cs.executeQuery();
-            while (rs.next()) {
-                if (kq == null) kq = new ArrayList<OrderDetails2>();
-                MenuItem2 item = new MenuItem2(
-                        rs.getInt("m_id"),
-                        rs.getString("name"),
-                        rs.getString("image"),
-                        rs.getBigDecimal("m_price"),
-                        rs.getString("m_status"),
-                        rs.getString("description")
-                );
-                OrderDetails2 detail = new OrderDetails2(
-                        rs.getInt("id"),
-                        rs.getInt("quantity"),
-                        rs.getBigDecimal("price"),
-                        rs.getBigDecimal("amount"),
-                        item
-                );
-                kq.add(detail);
+            try (CallableStatement statement = con.prepareCall("{call getOrderDetails2(?)}")) {
+                statement.setInt(1, orderSlipId);
+                try (ResultSet rs = statement.executeQuery()) {
+                    while (rs.next()) {
+                        MenuItem2 item = new MenuItem2(
+                                rs.getInt("m_id"),
+                                rs.getString("name"),
+                                rs.getString("image"),
+                                rs.getBigDecimal("m_price"),
+                                rs.getString("m_status"),
+                                rs.getString("description")
+                        );
+                        details.add(new OrderDetails2(
+                                rs.getInt("id"),
+                                rs.getInt("quantity"),
+                                rs.getBigDecimal("price"),
+                                rs.getBigDecimal("amount"),
+                                item
+                        ));
+                    }
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
-            kq = null;
+            return null;
         }
-        return kq;
+        return details;
     }
 }

@@ -5,13 +5,15 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <title>Tìm kiếm bàn ăn</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Tìm kiếm bàn ăn | RestMan</title>
+    <link href="../assets/restman.css" rel="stylesheet">
 </head>
 <%
     // lay id nhan vien ban hang
     Staff2 s = (Staff2)session.getAttribute("SalesStaff");
     if(s==null){
-        response.sendRedirect("login2.jsp?err=timeout");
+        response.sendRedirect("../staff/frmLogin2.jsp?err=timeout");
     }
     // lay danh sach ban an theo tu khoa tim kiem
     request.setCharacterEncoding("UTF-8");
@@ -24,26 +26,26 @@
         list = dao.getAllTable();
     }
 %>
-<body>
-<h2>Tìm kiếm bàn ăn</h2>
-<form name="timkiemban" action="frmSearchTable2.jsp" method="get">
-    <table border="0">
-        <tr>
-            <td>Nhập số bàn:</td>
-            <td><input type="text" name="keyword" value="<%= (key != null) ? key : "" %>" /></td>
-            <td><input type="submit" value="Tìm kiếm" /></td>
-        </tr>
-    </table>
+<body class="bg-light">
+<header class="site-header"><a class="site-brand" href="../index.jsp">RestMan</a></header>
+<main class="search-table-content">
+<h2 class="page-title">Tìm kiếm bàn ăn</h2>
+<form class="dish-search-form" name="timkiemban" action="frmSearchTable2.jsp" method="get">
+    <label for="keyword">Nhập số bàn:</label>
+    <input type="text" id="keyword" name="keyword" value="<%= (key != null) ? key : "" %>" />
+    <input type="submit" value="Tìm kiếm" />
 </form>
-<br/>
-<table style="border: 1px solid black; border-collapse: collapse;">
+<div class="table-results-scroll">
+<table class="data-table table-results-table" style="border: 1px solid black; border-collapse: collapse;">
     <thead>
-    <td style="border: 1px solid black; padding: 0 15px 0 15px;">T.T</td>
-    <td style="border: 1px solid black; padding: 0 15px 0 15px;">Số bàn</td>
-    <td style="border: 1px solid black; padding: 0 15px 0 15px;">Sức chứa</td>
-    <td style="border: 1px solid black; padding: 0 15px 0 15px;">Trạng thái</td>
-    <td style="border: 1px solid black; padding: 0 15px 0 15px;">Vị trí</td>
-    <td style="border: 1px solid black; padding: 0 15px 0 15px;">Chọn</td>
+    <tr>
+        <th>T.T</th>
+        <th>Số bàn</th>
+        <th>Sức chứa</th>
+        <th>Trạng thái</th>
+        <th>Vị trí</th>
+        <th>Thao tác</th>
+    </tr>
     </thead>
     <%
         if (list != null && !list.isEmpty()) {
@@ -73,7 +75,10 @@
         }
     %>
 </table>
-<br/>
-<button type="button" onclick="window.location.href='frmSalesMain2.jsp'">Quay lại</button>
+</div>
+<div class="search-table-footer">
+    <button type="button" onclick="window.location.href='frmSalesMain2.jsp'">Quay lại</button>
+</div>
+</main>
 </body>
 </html>

@@ -1,8 +1,9 @@
+
 <%@ page language="java" contentType="text/html; charset=UTF-8"
          pageEncoding="UTF-8" import="java.util.*,java.math.*,dao.*,model.*"%>
 <%!
     private String formatMoney(BigDecimal value) {
-        return new java.text.DecimalFormat("#,##0.00",
+        return new java.text.DecimalFormat("#,##0.##",
                 java.text.DecimalFormatSymbols.getInstance(java.util.Locale.GERMANY))
                 .format(value.setScale(2, RoundingMode.HALF_UP));
     }
@@ -18,8 +19,11 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <title>Tìm kiếm thông tin món ăn</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Tìm kiếm món ăn | RestMan</title>
+    <link href="../assets/restman.css" rel="stylesheet">
 </head>
+
 <%
     request.setCharacterEncoding("UTF-8");
     String key = request.getParameter("keyword");
@@ -31,25 +35,26 @@
         list = dao.getAllDish();
     }
 %>
-<body>
-<h2>Tìm kiếm thông tin món ăn</h2>
-<form name="timkiemmon" action="frmSearchDish2.jsp" method="get">
-    <table border="0">
-        <tr>
-            <td>Nhập tên món:</td>
-            <td><input type="text" name="keyword" value="<%= escapeHtml(key) %>" /></td>
-            <td><input type="submit" value="Tìm kiếm" /></td>
-        </tr>
-    </table>
-</form>
-<br/>
-<table style="border: 1px solid black; border-collapse: collapse;">
+
+<body class="bg-light">
+<header class="site-header"><a class="site-brand" href="../index.jsp">RestMan</a></header>
+<main class="search-table-content">
+    <h2 class="page-title">Tìm kiếm thông tin món ăn</h2>
+    <form class="dish-search-form" name="timkiemmon" action="frmSearchDish2.jsp" method="get">
+        <label for="keyword">Nhập tên món:</label>
+        <input type="text" id="keyword" name="keyword" value="<%= escapeHtml(key) %>" />
+        <input type="submit" value="Tìm kiếm" />
+    </form>
+<div class="table-results-scroll">
+<table class="data-table dish-results-table" style="border: 1px solid black; border-collapse: collapse;">
     <thead>
-    <td style="border: 1px solid black; padding: 0 15px 0 15px;">T.T</td>
-    <td style="border: 1px solid black; padding: 0 15px 0 15px;">Tên món</td>
-    <td style="border: 1px solid black; padding: 0 15px 0 15px;">Đơn giá (VNĐ)</td>
-    <td style="border: 1px solid black; padding: 0 15px 0 15px;">Hình ảnh</td>
-    <td style="border: 1px solid black; padding: 0 15px 0 15px;">Chọn</td>
+    <tr>
+        <th>T.T</th>
+        <th>Tên món</th>
+        <th>Đơn giá (VNĐ)</th>
+        <th>Hình ảnh</th>
+        <th>Thao tác</th>
+    </tr>
     </thead>
     <%
         if (list != null && !list.isEmpty()) {
@@ -82,7 +87,10 @@
         }
     %>
 </table>
-<br/>
-<button type="button" onclick="window.location.href='frmCustomerMain2.jsp'">Quay lại</button>
+</div>
+<div class="search-table-footer">
+    <button type="button" onclick="window.location.href='frmCustomerMain2.jsp'">Quay lại</button>
+</div>
+</main>
 </body>
 </html>

@@ -67,7 +67,7 @@ public class MenuItemDAO2 extends DAO2 {
     /**
      * Lay chi tiet mot mon an hoac combo theo @id
      * @param id ma mon an
-     * @return doi tuong Dish2 hoac Combo2 (kem danh sach mon thanh phan)
+     * @return doi tuong Dish2 hoac Combo2, chua kem danh sach mon thanh phan
      */
     public MenuItem2 getDishDetail(int id) {
         MenuItem2 kq = null;
@@ -90,10 +90,6 @@ public class MenuItemDAO2 extends DAO2 {
                     combo.setPortion(rs.getString("comboPortion"));
                     combo.setStartDate(rs.getDate("comboStartDate"));
                     combo.setEndDate(rs.getDate("comboEndDate"));
-                    ArrayList<ComboDetails2> dsChiTiet = getComboDetails(combo);
-                    if (dsChiTiet != null) {
-                        combo.setListComboDetails(dsChiTiet);
-                    }
                     kq = combo;
                 }
             }
@@ -106,7 +102,7 @@ public class MenuItemDAO2 extends DAO2 {
 
     /**
      * Lay danh sach cac mon thanh phan cua combo
-     * @param combo doi tuong Combo2
+     * @param combo doi tuong combo can lay thanh phan
      * @return danh sach ComboDetails2
      */
     public ArrayList<ComboDetails2> getComboDetails(Combo2 combo) {

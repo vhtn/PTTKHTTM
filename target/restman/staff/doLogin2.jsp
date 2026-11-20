@@ -10,8 +10,8 @@
     boolean kq = dao.checkLogin(staff);
     if(kq && (staff.getPosition().equalsIgnoreCase("SalesStaff"))){
         session.setAttribute("SalesStaff", staff);
-        response.sendRedirect("salesStaff\\frmSalesMain2.jsp");
+        response.sendRedirect("../salesStaff/frmSalesMain2.jsp");
     }else{
-        response.sendRedirect("gddangnhap.jsp?err=fail");
+        response.sendRedirect("frmLogin2.jsp?err=fail");
     }
 %>

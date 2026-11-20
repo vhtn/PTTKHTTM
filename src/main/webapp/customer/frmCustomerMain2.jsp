@@ -5,12 +5,15 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <title>Trang chủ khách hàng</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Trang chủ khách hàng | RestMan</title>
+    <link href="../assets/restman.css" rel="stylesheet">
 </head>
-<body>
-<h2>Trang chủ khách hàng</h2>
-<button type="button" onclick="window.location.href='frmSearchDish2.jsp'">
-    Tìm kiếm thông tin món ăn
-</button>
+<body class="bg-light">
+<header class="site-header"><a class="site-brand" href="../index.jsp">RestMan</a></header>
+<main class="portal-home">
+    <h2 class="page-title">Trang chủ khách hàng</h2>
+    <a class="btn" href="frmSearchDish2.jsp">Tìm kiếm món ăn</a>
+</main>
 </body>
 </html>

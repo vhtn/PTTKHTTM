@@ -41,7 +41,7 @@
     }
 
     private String formatMoney(BigDecimal value) {
-        return new java.text.DecimalFormat("#,##0.00",
+        return new java.text.DecimalFormat("#,##0.##",
                 java.text.DecimalFormatSymbols.getInstance(java.util.Locale.GERMANY))
                 .format(value.setScale(2, RoundingMode.HALF_UP));
     }
@@ -253,18 +253,16 @@
         connection.setAutoCommit(false);
         transactionStarted = true;
 
+        if (card != null) {
+            if (!(new MembershipCardDAO2()).updatePoint(card.getId(), bill.getTotalAmount())) {
+                throw new java.sql.SQLException("Không cập nhật được điểm thẻ thành viên.");
+            }
+        }
         if (!(new BillDAO2()).saveBill(bill)) {
             throw new java.sql.SQLException("Không lưu được hóa đơn.");
         }
         if (!(new OrderSlipDAO2()).updateStatus(orderSlip.getId(), "Đã thanh toán")) {
             throw new java.sql.SQLException("Không cập nhật được trạng thái phiếu gọi món.");
-        }
-        if (card != null) {
-            int currentPoints = card.getPoint() != null ? card.getPoint() : 0;
-            int addedPoints = bill.getTotalAmount().setScale(0, RoundingMode.HALF_UP).intValue();
-            if (!(new MembershipCardDAO2()).updatePoint(card.getId(), currentPoints + addedPoints)) {
-                throw new java.sql.SQLException("Không cập nhật được điểm thẻ thành viên.");
-            }
         }
 
         connection.commit();

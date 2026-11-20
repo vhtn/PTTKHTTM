@@ -3,8 +3,6 @@ package dao;
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.util.ArrayList;
-import model.OrderDetails2;
 import model.OrderSlip2;
 import model.ReservationSlip2;
 import model.Staff2;
@@ -18,95 +16,60 @@ public class OrderSlipDAO2 extends DAO2 {
     }
 
     /**
-     * Lay phieu goi mon dang su dung cua ban @tableId
+     * Lay phieu goi mon dang su dung cua ban
      * @param tableId ma ban an
-     * @return doi tuong OrderSlip2 kem chi tiet mon da goi
+     * @return OrderSlip2 neu tim thay, null neu khong co phieu
      */
     public OrderSlip2 getOrderSlip(int tableId) {
-        OrderSlip2 kq = null;
-        String sql = "{call getOrderSlip2(?)}"; // su dung stored procedure
-        try {
-            CallableStatement cs = con.prepareCall(sql);
-            cs.setInt(1, tableId);
-            ResultSet rs = cs.executeQuery();
-            if (rs.next()) {
-                kq = new OrderSlip2();
-                kq.setId(rs.getInt("id"));
-                kq.setDate(rs.getTimestamp("date"));
-                kq.setGuestCount(rs.getInt("guestCount"));
-                kq.setStatus(rs.getString("status"));
+        OrderSlip2 orderSlip = null;
+        try (CallableStatement statement = con.prepareCall("{call getOrderSlip2(?)}")) {
+            statement.setInt(1, tableId);
+            try (ResultSet rs = statement.executeQuery()) {
+                if (rs.next()) {
+                    orderSlip = new OrderSlip2();
+                    orderSlip.setId(rs.getInt("id"));
+                    orderSlip.setDate(rs.getTimestamp("date"));
+                    orderSlip.setGuestCount(rs.getInt("guestCount"));
+                    orderSlip.setStatus(rs.getString("status"));
 
-                // Nhan vien ban hang
-                Staff2 staff = new Staff2();
-                staff.setId(rs.getInt("tblSalesStaff2_id"));
-                kq.setSalesStaff(staff);
+                    Staff2 staff = new Staff2();
+                    staff.setId(rs.getInt("tblSalesStaff2_id"));
+                    orderSlip.setSalesStaff(staff);
 
-                // Ban an
-                Table2 t = new Table2();
-                t.setId(rs.getInt("tableId"));
-                t.setNumber(rs.getString("tableNumber"));
-                t.setCapacity(rs.getInt("tableCapacity"));
-                t.setStatus(rs.getString("tableStatus"));
-                t.setLocation(rs.getString("tableLocation"));
-                kq.setTable(t);
+                    Table2 table = new Table2();
+                    table.setId(rs.getInt("tableId"));
+                    table.setNumber(rs.getString("tableNumber"));
+                    table.setCapacity(rs.getInt("tableCapacity"));
+                    table.setStatus(rs.getString("tableStatus"));
+                    table.setLocation(rs.getString("tableLocation"));
+                    orderSlip.setTable(table);
 
-                // Phieu dat ban (neu co)
-                int resId = rs.getInt("tblReservationSlip2_id");
-                if (!rs.wasNull()) {
-                    ReservationSlip2 res = new ReservationSlip2();
-                    res.setId(resId);
-                    kq.setReservationSlip(res);
-                }
-
-                // Danh sach chi tiet mon goi (goi sang OrderDetailsDAO2)
-                ArrayList<OrderDetails2> dsChiTiet = (new OrderDetailsDAO2()).getOrderDetails(kq);
-                if (dsChiTiet != null) {
-                    kq.setListOrderDetails(dsChiTiet);
+                    int reservationId = rs.getInt("tblReservationSlip2_id");
+                    if (!rs.wasNull()) {
+                        ReservationSlip2 reservation = new ReservationSlip2();
+                        reservation.setId(reservationId);
+                        orderSlip.setReservationSlip(reservation);
+                    }
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
-            kq = null;
         }
-        return kq;
+        return orderSlip;
     }
 
     /**
-     * Cap nhat trang thai phieu goi mon
+     * Danh dau phieu goi mon da thanh toan
      * @param id ma phieu goi mon
-     * @param status trang thai moi
      * @return thanh cong hay that bai
      */
-    public boolean updateStatus(int id, String status) {
-        String sqlGetTable = "SELECT tblTable2_id FROM tblOrderSlip2 WHERE id = ?";
-        String sqlUpdateOrderSlip = "UPDATE tblOrderSlip2 SET status = ? WHERE id = ?";
-        String sqlUpdateTable = "UPDATE tblTable2 SET status = 'Trống' WHERE id = ? AND NOT EXISTS "
-                + "(SELECT 1 FROM tblOrderSlip2 WHERE tblTable2_id = ? AND status = 'Đang sử dụng')";
+    public boolean updateStatus(int id) {
+        String sqlUpdateOrderSlip = "UPDATE tblOrderSlip2 SET status = 'Đã thanh toán' WHERE id = ?";
         try {
-            int tableId;
-            try (PreparedStatement psTable = con.prepareStatement(sqlGetTable)) {
-                psTable.setInt(1, id);
-                try (ResultSet rs = psTable.executeQuery()) {
-                    if (!rs.next()) {
-                        return false;
-                    }
-                    tableId = rs.getInt("tblTable2_id");
-                }
-            }
-
             try (PreparedStatement ps = con.prepareStatement(sqlUpdateOrderSlip)) {
-            ps.setString(1, status);
-            ps.setInt(2, id);
+                ps.setInt(1, id);
                 if (ps.executeUpdate() != 1) {
                     return false;
-                }
-            }
-
-            if ("Đã thanh toán".equals(status)) {
-                try (PreparedStatement psTable = con.prepareStatement(sqlUpdateTable)) {
-                    psTable.setInt(1, tableId);
-                    psTable.setInt(2, tableId);
-                    psTable.executeUpdate();
                 }
             }
             return true;

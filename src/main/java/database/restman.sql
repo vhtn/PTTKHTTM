@@ -32,7 +32,7 @@ CREATE TABLE tblMembershipCard2 (
                                     code VARCHAR(50) NOT NULL UNIQUE,
                                     date DATE NOT NULL,
                                     status ENUM('Hoạt động', 'Khoá') NOT NULL,
-                                    rank_level ENUM('Vàng', 'Bạc', 'Đồng') NOT NULL,
+                                    rank_level ENUM('Chưa có', 'Vàng', 'Bạc', 'Đồng') NOT NULL DEFAULT 'Chưa có',
                                     point INT DEFAULT 0,
                                     tblCustomer2_id INT NOT NULL UNIQUE,
                                     tblSalesStaff2_id INT NOT NULL,
@@ -208,7 +208,7 @@ INSERT INTO tblMembershipCard2 (code, date, status, rank_level, point, tblCustom
                                                                                                                ('CARD001', '2026-01-15', 'Hoạt động', 'Vàng', 1500, 1, 1),
                                                                                                                ('CARD002', '2026-03-10', 'Hoạt động', 'Bạc', 720, 2, 1),
                                                                                                                ('CARD003', '2026-05-22', 'Hoạt động', 'Đồng', 250, 3, 1),
-                                                                                                               ('CARD004', '2026-06-01', 'Khoá', 'Đồng', 50, 4, 1);
+                                                                                                               ('CARD004', '2026-06-01', 'Khoá', 'Chưa có', 50, 4, 1);
 
 -- 4. Bàn ăn (ID 1-8)
 INSERT INTO tblTable2 (number, capacity, status, location) VALUES
@@ -310,3 +310,50 @@ INSERT INTO tblImportReceiptDetails2 (quantity, price, amount, tblImportReceipt2
                                                                                                             (10, 140000, 1400000, 1, 3),
                                                                                                             (8, 480000, 3840000, 2, 2),
                                                                                                             (12, 55000, 660000, 2, 5);
+
+-- 10. Dữ liệu mẫu bổ sung
+INSERT INTO tblCustomer2 (name, phone) VALUES
+                                          ('Trương Ngọc Mai', '0912345006'),
+                                          ('Đặng Quốc Bảo', '0912345007');
+
+INSERT INTO tblMembershipCard2 (code, date, status, rank_level, point, tblCustomer2_id, tblSalesStaff2_id) VALUES
+                                                                                                               ('CARD005', '2026-10-15', 'Hoạt động', 'Chưa có', 90, 6, 1),
+                                                                                                               ('CARD006', '2026-08-20', 'Hoạt động', 'Bạc', 525, 7, 1);
+
+INSERT INTO tblTable2 (number, capacity, status, location) VALUES
+                                                               ('Bàn 09', 4, 'Đang sử dụng', 'Tầng 1 - Khu C'),
+                                                               ('Bàn 10', 2, 'Đã đặt', 'Tầng 1 - Cửa sổ'),
+                                                               ('Bàn 11', 6, 'Trống', 'Tầng 2 - Khu C');
+
+INSERT INTO tblReservationSlip2 (guestCount, bookingDate, status, tblCustomer2_id, tblTable2_id, tblSalesStaff2_id) VALUES
+                                                                                                                        (2, '2026-11-21 18:30:00', 'Đã xác nhận', 6, 10, 1);
+
+INSERT INTO tblMenuItem2 (name, image, price, status, description) VALUES
+                                                                       ('Tôm chiên xù', 'fried_shrimp.jpg', 125000, 'Còn phục vụ', 'Tôm tươi chiên giòn ăn kèm sốt chanh'),
+                                                                       ('Bánh flan caramel', 'flan.jpg', 45000, 'Còn phục vụ', 'Bánh flan mềm mịn phủ caramel'),
+                                                                       ('Combo Gia Đình Cuối Tuần', 'combo_weekend.jpg', 550000, 'Còn phục vụ', 'Combo gà nướng, mì Ý, nước ép và bánh flan');
+
+INSERT INTO tblDish2 (tblMenuItem2_id, size, unit, category) VALUES
+                                                                 (11, '6 con', 'Đĩa', 'Khai vị'),
+                                                                 (12, 'Vừa', 'Cái', 'Tráng miệng');
+
+INSERT INTO tblCombo2 (tblMenuItem2_id, portion, startDate, endDate) VALUES
+                                                                         (13, '4 người', '2026-01-01', '2026-12-31');
+
+INSERT INTO tblComboDetails2 (quantity, price, amount, tblCombo2_id, tblDish2_id) VALUES
+                                                                                      (1, 260000, 260000, 13, 3),
+                                                                                      (1, 110000, 110000, 13, 6),
+                                                                                      (2, 35000, 70000, 13, 7),
+                                                                                      (2, 45000, 90000, 13, 12);
+
+INSERT INTO tblOrderSlip2 (date, guestCount, status, tblTable2_id, tblSalesStaff2_id, tblReservationSlip2_id) VALUES
+                                                                                                                  ('2026-11-20 12:15:00', 3, 'Đang sử dụng', 9, 1, NULL),
+                                                                                                                  ('2026-11-19 19:30:00', 4, 'Đã thanh toán', 11, 1, NULL);
+
+INSERT INTO tblOrderDetails2 (quantity, price, amount, tblOrderSlip2_id, tblMenuItem2_id) VALUES
+                                                                                              (2, 125000, 250000, 6, 11),
+                                                                                              (1, 40000, 40000, 6, 8),
+                                                                                              (1, 550000, 550000, 7, 13);
+
+INSERT INTO tblBill2 (date, totalAmount, discountPercent, status, cashGiven, changeAmount, tblOrderSlip2_id, tblSalesStaff2_id, tblMembershipCard2_id) VALUES
+                                                                                                                                                           ('2026-11-19 20:15:00', 495000, 10, 'Đã thanh toán', 500000, 5000, 7, 1, 6);

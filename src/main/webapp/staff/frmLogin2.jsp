@@ -5,21 +5,26 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <title>Đăng nhập</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Đăng nhập nhân viên | RestMan</title>
+    <link href="../assets/restman.css" rel="stylesheet">
 </head>
 <body>
+<header class="site-header"><a class="site-brand" href="../index.jsp">RestMan</a></header>
+
+<div class="login-shell"><div class="login-card">
+<h2 class="page-title">Đăng nhập</h2>
 <%
     if(request.getParameter("err") !=null &&
             request.getParameter("err").equalsIgnoreCase("timeout")){
-%> <h4>Hết phiên làm việc. Vui lòng đăng nhập lại!</h4><%
+%> <div class="alert">Hết phiên làm việc. Vui lòng đăng nhập lại!</div><%
 }else if(request.getParameter("err") !=null &&
         request.getParameter("err").equalsIgnoreCase("fail")){
-%> <h4 color="red">Sai tên đăng nhập/mật khẩu!</h4><%
+%> <div class="alert">Sai tên đăng nhập/mật khẩu!</div><%
     }
 %>
-<h2> Đăng nhập </h2>
 <form name="dangnhap" action="doLogin2.jsp" method="post">
-    <table border="0">
+    <table class="login-form-table" border="0">
         <tr>
             <td>Tên đăng nhập:</td>
             <td><input type="text" name="username" id="username"
@@ -36,5 +41,6 @@
         </tr>
     </table>
 </form>
+</div></div>
 </body>
 </html>

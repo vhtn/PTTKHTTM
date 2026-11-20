@@ -7,7 +7,7 @@
     }
 
     private String formatMoney(BigDecimal value) {
-        return new java.text.DecimalFormat("#,##0.00",
+        return new java.text.DecimalFormat("#,##0.##",
                 java.text.DecimalFormatSymbols.getInstance(java.util.Locale.GERMANY))
                 .format(value.setScale(2, RoundingMode.HALF_UP));
     }
@@ -17,13 +17,15 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <title>Hóa đơn bán hàng</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Thanh toán hóa đơn | RestMan</title>
+    <link href="../assets/restman.css" rel="stylesheet">
 </head>
 <%
     // lay id nhan vien ban hang
     Staff2 s = (Staff2)session.getAttribute("SalesStaff");
     if(s==null){
-        response.sendRedirect("login2.jsp?err=timeout");
+        response.sendRedirect("../staff/frmLogin2.jsp?err=timeout");
     }
     request.setCharacterEncoding("UTF-8");
 
@@ -51,6 +53,15 @@
         }
     } else {
         card = (MembershipCard2) session.getAttribute("currentCard");
+        if (card != null) {
+            card = (new MembershipCardDAO2()).getCardByCode(card.getCode());
+            if (card != null && "Hoạt động".equalsIgnoreCase(card.getStatus())) {
+                session.setAttribute("currentCard", card);
+            } else {
+                card = null;
+                session.removeAttribute("currentCard");
+            }
+        }
     }
 
     if (card != null) {
@@ -65,27 +76,22 @@
     SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
     String currentDateStr = sdf.format(new Date());
 %>
-<body>
-<h2>Hóa đơn bán hàng</h2>
-<table border="0">
-    <tr>
-        <td><strong>Nhà hàng RestMan</strong> - Số 2 - Phố A - Phường B, Thành phố C (DĐ: 0908123xxx)</td>
-    </tr>
-    <tr>
-        <td>Số hóa đơn: <strong><%= orderSlip.getId() %></strong> | Ngày: <strong><%= currentDateStr %></strong></td>
-    </tr>
-</table>
-<br/>
+<body class="bg-light bill-page">
+<header class="site-header"><a class="site-brand" href="../index.jsp">RestMan</a></header>
+<main class="bill-content">
+<h2 class="page-title">Hóa đơn bán hàng</h2>
+<div class="restaurant-info"><strong>Nhà hàng RestMan</strong> - Số 2 - Phố A - Phường B, Thành phố C (DĐ: 0908123xxx)</div>
+<div class="bill-meta">
+    <span>Ngày giờ: <strong><%= currentDateStr %></strong></span>
+    <span>Số hóa đơn: <strong><%= orderSlip.getId() %></strong></span>
+</div>
 
 <!-- Form kiem tra ma the thanh vien -->
-<form name="kiemtrathe" action="frmBill2.jsp" method="get">
-    <table border="0">
-        <tr>
-            <td>Mã thẻ thành viên (nếu có):</td>
-            <td><input type="text" name="cardCode" value="<%= (cardCode != null) ? cardCode : (card != null ? card.getCode() : "") %>" /></td>
-            <td><input type="submit" value="Kiểm tra" /></td>
-        </tr>
-    </table>
+<form class="dish-search-form" name="kiemtrathe" action="frmBill2.jsp" method="get">
+    <label for="cardCode">Mã thẻ thành viên (nếu có):</label>
+    <input type="text" id="cardCode" name="cardCode"
+           value="<%= (cardCode != null) ? cardCode : (card != null ? card.getCode() : "") %>" />
+    <input type="submit" value="Kiểm tra" />
 </form>
 
 <% if (card != null) { %>
@@ -95,19 +101,21 @@
 <% } %>
 
 <!-- Form luu va in hoa don -->
-<form name="thanhtoan" action="doSaveBill2.jsp" method="post">
+<form class="bill-payment-form" name="thanhtoan" action="doSaveBill2.jsp" method="post">
     <input type="hidden" name="cardCode" value="<%= card != null ? card.getCode() : "" %>" />
     <input type="hidden" name="discountPercent" value="<%= discountPercent.toPlainString() %>" />
     <input type="hidden" name="totalAmount" value="<%= totalAmount.toPlainString() %>" />
     <input type="hidden" name="finalAmount" value="<%= finalAmount.toPlainString() %>" />
 
-    <table style="border: 1px solid black; border-collapse: collapse;">
+    <table class="data-table bill-items-table" style="border: 1px solid black; border-collapse: collapse;">
         <thead>
-        <td style="border: 1px solid black; padding: 0 15px 0 15px;">T.T</td>
-        <td style="border: 1px solid black; padding: 0 15px 0 15px;">Tên món</td>
-        <td style="border: 1px solid black; padding: 0 15px 0 15px;">Số lượng</td>
-        <td style="border: 1px solid black; padding: 0 15px 0 15px;">Đơn giá (VNĐ)</td>
-        <td style="border: 1px solid black; padding: 0 15px 0 15px;">Thành tiền (VNĐ)</td>
+        <tr>
+            <th>T.T</th>
+            <th>Tên món</th>
+            <th>Số lượng</th>
+            <th>Đơn giá (VNĐ)</th>
+            <th>Thành tiền (VNĐ)</th>
+        </tr>
         </thead>
         <%
             ArrayList<OrderDetails2> listDetails = orderSlip.getListOrderDetails();
@@ -135,38 +143,39 @@
             }
         %>
     </table>
-    <br/>
-
-    <table border="0">
-        <tr>
-            <td>Tổng tiền:</td>
-            <td><strong><%= formatMoney(totalAmount) %> VNĐ</strong></td>
-        </tr>
-        <tr>
-            <td>Giảm giá (<%= discountPercent.intValue() %>%):</td>
-            <td><strong><%= formatMoney(discountAmount) %> VNĐ</strong></td>
-        </tr>
-        <tr>
-            <td>Tổng cộng phải thanh toán:</td>
-            <td><strong><%= formatMoney(finalAmount) %> VNĐ</strong></td>
-        </tr>
-        <tr>
-            <td>Tiền khách đưa:</td>
-            <td>
+    <section class="bill-summary" aria-label="Thông tin thanh toán">
+        <div class="bill-summary-row">
+            <span>Tổng tiền:</span>
+            <strong><%= formatMoney(totalAmount) %> VNĐ</strong>
+        </div>
+        <div class="bill-summary-row">
+            <span>Giảm giá (<%= discountPercent.intValue() %>%):</span>
+            <strong><%= formatMoney(discountAmount) %> VNĐ</strong>
+        </div>
+        <div class="bill-summary-row bill-payable">
+            <span>Tổng cộng phải thanh toán:</span>
+            <strong><%= formatMoney(finalAmount) %> VNĐ</strong>
+        </div>
+        <div class="bill-summary-row">
+            <label for="cashGiven">Tiền khách đưa:</label>
+            <span class="cash-input-wrap">
                 <input type="number" id="cashGiven" name="cashGiven" step="0.01" min="<%= finalAmount.toPlainString() %>"
-                       required oninput="calculateChange()" /> VNĐ
-            </td>
-        </tr>
-        <tr>
-            <td>Tiền thừa trả lại khách:</td>
-            <td><strong id="changeText">0 VNĐ</strong></td>
-        </tr>
-    </table>
-    <br/>
+                       required oninput="calculateChange()" />
+                <span>VNĐ</span>
+            </span>
+        </div>
+        <div class="bill-summary-row">
+            <span>Tiền thừa trả lại khách:</span>
+            <strong id="changeText">0 VNĐ</strong>
+        </div>
+    </section>
 
-    <input type="submit" value="In hoá đơn" />
-    <button type="button" onclick="window.location.href='frmBillDetail2.jsp?tableId=<%= orderSlip.getTable().getId() %>'">Quay lại</button>
+    <div class="bill-actions">
+        <button type="button" onclick="window.location.href='frmBillDetail2.jsp?tableId=<%= orderSlip.getTable().getId() %>'">Quay lại</button>
+        <input type="submit" value="In hóa đơn" />
+    </div>
 </form>
+</main>
 
 <script type="text/javascript">
     document.forms["thanhtoan"].addEventListener("submit", function(event) {

@@ -9,7 +9,7 @@ public class MembershipCard2 implements Serializable {
     private String code;
     private Date date;
     private String status; // 'Hoat dong', 'Khoa'
-    private String rankLevel; // 'Vang', 'Bac', 'Dong'
+    private String rankLevel; // 'Chua co', 'Vang', 'Bac', 'Dong'
     private Integer point;
     private Customer2 customer;
     private Staff2 salesStaff;

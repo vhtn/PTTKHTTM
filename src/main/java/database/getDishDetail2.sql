@@ -7,6 +7,6 @@ BEGIN
     FROM tblMenuItem2 mi 
     LEFT JOIN tblDish2 d ON d.tblMenuItem2_id = mi.id 
     LEFT JOIN tblCombo2 c ON c.tblMenuItem2_id = mi.id 
-    WHERE mi.id = itemId AND mi.status = 'Còn phục vụ';
+    WHERE mi.id = itemId AND mi.status IN ('Còn phục vụ', 'Tạm hết');
 END
 

@@ -2,6 +2,10 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
          pageEncoding="UTF-8" import="java.util.*,java.math.*,dao.*,model.*"%>
 <%!
+    private boolean isValidSearchText(String value) {
+        return value != null && value.matches("[\\p{L}\\p{N} ]*");
+    }
+
     private String formatMoney(BigDecimal value) {
         return new java.text.DecimalFormat("#,##0.##",
                 java.text.DecimalFormatSymbols.getInstance(java.util.Locale.GERMANY))
@@ -29,7 +33,10 @@
     String key = request.getParameter("keyword");
     MenuItemDAO2 dao = new MenuItemDAO2();
     ArrayList<MenuItem2> list = null;
-    if (key != null && !key.trim().isEmpty()) {
+    boolean invalidKeyword = key != null && !key.trim().isEmpty() && !isValidSearchText(key);
+    if (invalidKeyword) {
+        list = dao.getAllDish();
+    } else if (key != null && !key.trim().isEmpty()) {
         list = dao.getDish(key.trim());
     } else {
         list = dao.getAllDish();
@@ -37,6 +44,9 @@
 %>
 
 <body class="bg-light">
+<% if (invalidKeyword) { %>
+<script type="text/javascript">alert("Dữ liệu không phù hợp");</script>
+<% } %>
 <header class="site-header"><a class="site-brand" href="../index.jsp">RestMan</a></header>
 <main class="search-table-content">
     <h2 class="page-title">Tìm kiếm thông tin món ăn</h2>

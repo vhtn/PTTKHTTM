@@ -1,5 +1,10 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
          pageEncoding="UTF-8" import="java.util.*,dao.*,model.*"%>
+<%!
+    private boolean isValidSearchText(String value) {
+        return value != null && value.matches("[\\p{L}\\p{N} ]*");
+    }
+%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
 "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -14,19 +19,26 @@
     Staff2 s = (Staff2)session.getAttribute("SalesStaff");
     if(s==null){
         response.sendRedirect("../staff/frmLogin2.jsp?err=timeout");
+        return;
     }
     // lay danh sach ban an theo tu khoa tim kiem
     request.setCharacterEncoding("UTF-8");
     String key = request.getParameter("keyword");
     TableDAO2 dao = new TableDAO2();
     ArrayList<Table2> list = null;
-    if (key != null && !key.trim().isEmpty()) {
+    boolean invalidKeyword = key != null && !key.trim().isEmpty() && !isValidSearchText(key);
+    if (invalidKeyword) {
+        list = dao.getAllTable();
+    } else if (key != null && !key.trim().isEmpty()) {
         list = dao.searchTableByNumber(key.trim());
     } else {
         list = dao.getAllTable();
     }
 %>
 <body class="bg-light">
+<% if (invalidKeyword) { %>
+<script type="text/javascript">alert("Dữ liệu không phù hợp");</script>
+<% } %>
 <header class="site-header"><a class="site-brand" href="../index.jsp">RestMan</a></header>
 <main class="search-table-content">
 <h2 class="page-title">Tìm kiếm bàn ăn</h2>

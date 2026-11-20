@@ -236,7 +236,7 @@
         e.printStackTrace();
         response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         response.setContentType("text/plain; charset=UTF-8");
-        response.getWriter().write("Không thể tạo file PDF hóa đơn.");
+        response.getWriter().write("Không thể lưu hóa đơn.");
         return;
     }
 
@@ -299,6 +299,6 @@
     } else {
         response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         response.setContentType("text/plain; charset=UTF-8");
-        response.getWriter().write("Lỗi thanh toán và lưu hóa đơn!");
+        response.getWriter().write("Không thể lưu hóa đơn.");
     }
 %>

@@ -32,7 +32,7 @@
             orderSlip = (new OrderSlipDAO2()).getOrderSlip(tableId);
             if (orderSlip != null) {
                 ArrayList<OrderDetails2> details =
-                        (new OrderDetailsDAO2()).getOrderDetails(orderSlip);
+                        (new OrderDetailsDAO2()).getOrderDetails(orderSlip.getId());
                 if (details == null) {
                     orderSlip = null;
                     session.removeAttribute("currentOrderSlip");
